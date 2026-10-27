@@ -1,0 +1,39 @@
+{
+    "custom/mpris_heart": {
+        "return-type": "json",
+        "format": "{text}",
+        "tooltip": true,
+        "interval": 1,
+        "signal": 7,
+        "exec": "curl -m 1 -fsS http://127.0.0.1:17311/waybar || echo '{\"text\":\" \",\"class\":\"unliked\"}'",
+        "on-click": "curl -m 1 -fsS -X POST http://127.0.0.1:17311/toggle >/dev/null"
+    },
+
+    "custom/ym_mpris": {
+        "name": "ym",
+        "format": "{text}",
+        "markup": "pango",
+        "return-type": "json",
+        "interval": 1,
+        "signal": 6,
+        "tooltip": true,
+        "exec": "~/.config/waybar/modules/ym_mpris.sh",
+        "on-click": "~/.local/bin/ym_playerctl play-pause",
+        "on-scroll-up": "~/.local/bin/ym_playerctl next",
+        "on-scroll-down": "~/.local/bin/ym_playerctl previous",
+        "on-click-middle": "~/.local/bin/ym_wpvol mute"
+    },
+
+    "custom/ym_volume": {
+        "return-type": "json",
+        "format": "{text}",
+        "tooltip": true,
+        "interval": 1,
+        "signal": 8,
+        "exec": "curl -m 1 -fsS http://127.0.0.1:17312/ymvol || echo '{\"text\":\"󰕾 --%\",\"class\":\"ymvol\"}'",
+        "on-scroll-up": "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/up?step=2' >/dev/null",
+        "on-scroll-down": "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/down?step=2' >/dev/null",
+        "on-click": "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/mute' >/dev/null",
+        "on-click-right": "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/set?pct=50' >/dev/null"
+    }
+}

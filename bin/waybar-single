@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec /usr/bin/flock -n "$HOME/.cache/waybar.lock" /usr/bin/waybar -c "$HOME/.config/waybar/config" -s "$HOME/.config/waybar/style.css"

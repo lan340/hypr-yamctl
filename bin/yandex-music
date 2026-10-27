@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Yandex Music через electron34 с DevTools + отдельный профиль, чтобы не склеивался со старым инстансом
+
+export ELECTRON_ENABLE_ACCESSIBILITY=1
+export GTK_MODULES=atk-bridge
+export NO_AT_BRIDGE=0
+
+exec /usr/lib/electron34/electron \
+  --remote-debugging-port=9222 \
+  --remote-debugging-address=127.0.0.1 \
+  --force-renderer-accessibility \
+  --no-sandbox \
+  --ozone-platform=wayland \
+  --standard-schemes=music-application \
+  --secure-schemes=music-application \
+  --cors-schemes=music-application \
+  --fetch-schemes=music-application \
+  --service-worker-schemes=music-application \
+  --user-data-dir="$HOME/.config/yandex-music-devtools" \
+  /usr/lib/yandex-music/yandex-music.asar "$@"

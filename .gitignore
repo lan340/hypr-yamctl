@@ -1,0 +1,16 @@
+# Backups and temporary files
+*.bak*
+*.tmp*
+*.swp
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Node & package manager artifacts
+node_modules/
+.npm/
+
+# Waybar lock
+.waybar.lock

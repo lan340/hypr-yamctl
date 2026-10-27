@@ -1,0 +1,80 @@
+/* =========================================================================
+   Yandex Music Waybar Styling
+   ========================================================================= */
+
+/* Heart (Like) button */
+#custom-mpris_heart {
+  background-color: #111827;
+  border-radius: 14px;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 28px;
+  color: transparent;
+}
+
+#custom-mpris_heart.unliked {
+  background-image: url("file://{{SVG_DIR}}/heart-dis.svg");
+  background-color: #111827;
+}
+
+#custom-mpris_heart.liked {
+  background-image: url("file://{{SVG_DIR}}/heart-like.svg");
+  background-color: #111827;
+}
+
+/* Track info & circular progress */
+#custom-ym_mpris {
+  background-color: #111827;
+  border-radius: 14px;
+  padding: 6px 10px;
+  padding-left: 24px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 27px;
+  font-size: 13px;
+}
+
+#custom-ym_mpris.stopped {
+  background-image: url("file://{{SVG_DIR}}/stop.svg");
+}
+
+/* Paused states + progress */
+#custom-ym_mpris.paused-p0   { background-image: url("file://{{SVG_DIR}}/prog_play/play-00.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p10  { background-image: url("file://{{SVG_DIR}}/prog_play/play-10.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p20  { background-image: url("file://{{SVG_DIR}}/prog_play/play-20.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p30  { background-image: url("file://{{SVG_DIR}}/prog_play/play-30.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p40  { background-image: url("file://{{SVG_DIR}}/prog_play/play-40.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p50  { background-image: url("file://{{SVG_DIR}}/prog_play/play-50.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p60  { background-image: url("file://{{SVG_DIR}}/prog_play/play-60.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p70  { background-image: url("file://{{SVG_DIR}}/prog_play/play-70.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p80  { background-image: url("file://{{SVG_DIR}}/prog_play/play-80.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p90  { background-image: url("file://{{SVG_DIR}}/prog_play/play-90.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p100 { background-image: url("file://{{SVG_DIR}}/prog_play/play-100.svg"); padding-left: 50px; background-position: 12px center; }
+
+/* Playing states + progress */
+#custom-ym_mpris.playing-p0   { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-00.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p10  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-10.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p20  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-20.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p30  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-30.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p40  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-40.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p50  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-50.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p60  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-60.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p70  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-70.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p80  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-80.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p90  { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-90.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p100 { background-image: url("file://{{SVG_DIR}}/prog_pause/pause-100.svg"); padding-left: 50px; background-position: 12px center; }
+
+#custom-ym_mpris.playing,
+#custom-ym_mpris.paused {
+  padding-left: 55px;
+}
+
+/* Yandex Music Volume */
+#custom-ym_volume {
+  background-color: #111827;
+  border-radius: 14px;
+  padding: 10px;
+}

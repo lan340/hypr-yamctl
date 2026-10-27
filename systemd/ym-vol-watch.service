@@ -1,0 +1,15 @@
+[Unit]
+Description=Yandex Music volume bridge (Waybar CDP helper)
+After=default.target
+PartOf=default.target
+
+[Service]
+Type=simple
+ExecStart=/home/lan/.local/bin/ym-node /home/lan/.local/bin/ym-vol-watch.js
+Restart=always
+RestartSec=2
+Environment=NODE_PATH=/usr/lib/node_modules
+Environment=PATH=/usr/bin:/usr/local/bin:/home/lan/.local/bin
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+action="${1:-up}"   # up | down | mute
+step="${2:-5%}"     # 5% / 2% / 10%
+
+player="$("$HOME/.local/bin/ym_playerctl" player 2>/dev/null || true)"
+[[ -z "${player:-}" ]] && exit 0
+
+# 1) PID: сначала пробуем mpris:pid, потом D-Bus
+pid="$(playerctl -p "$player" metadata mpris:pid 2>/dev/null | tr -cd '0-9' || true)"
+
+if [[ -z "${pid:-}" ]]; then
+  service="org.mpris.MediaPlayer2.${player}"
+  owner="$(busctl --user --no-pager call org.freedesktop.DBus /org/freedesktop/DBus \
+    org.freedesktop.DBus GetNameOwner s "$service" 2>/dev/null | awk '{print $2}' | tr -d '"')"
+  [[ -z "${owner:-}" ]] && exit 0
+  pid="$(busctl --user --no-pager call org.freedesktop.DBus /org/freedesktop/DBus \
+    org.freedesktop.DBus GetConnectionUnixProcessID s "$owner" 2>/dev/null | awk '{print $2}')"
+fi
+
+[[ -z "${pid:-}" ]] && exit 0
+
+# 2) Найти stream-id в PipeWire, принадлежащий этому PID
+cache="/tmp/ym_wpvol_stream_${pid}"
+stream_id=""
+
+# пробуем кеш
+if [[ -f "$cache" ]]; then
+  sid="$(cat "$cache" 2>/dev/null || true)"
+  if [[ -n "${sid:-}" ]] && wpctl inspect "$sid" 2>/dev/null | grep -qE "application\.process\.id.*${pid}"; then
+    stream_id="$sid"
+  fi
+fi
+
+# если кеш не подошёл — ищем по Streams
+if [[ -z "${stream_id:-}" ]]; then
+  mapfile -t ids < <(wpctl status 2>/dev/null | awk '
+    $0 ~ /Streams:/ {in_streams=1; next}
+    in_streams && $0 ~ /^[[:space:]]*[0-9]+\./ {
+      id=$1; gsub(/\./,"",id); print id; next
+    }
+    in_streams && $0 ~ /^[^[:space:]]/ {in_streams=0}
+  ')
+
+  for id in "${ids[@]}"; do
+    if wpctl inspect "$id" 2>/dev/null | grep -qE "application\.process\.id.*${pid}"; then
+      stream_id="$id"
+      echo "$id" > "$cache" 2>/dev/null || true
+      break
+    fi
+  done
+fi
+
+# если сейчас нет активного аудио-стрима (музыка на паузе) — менять нечего
+[[ -z "${stream_id:-}" ]] && exit 0
+
+case "$action" in
+  up)   wpctl set-volume "$stream_id" "${step}+" ;;
+  down) wpctl set-volume "$stream_id" "${step}-" ;;
+  mute) wpctl set-mute   "$stream_id" toggle     ;;
+  *) exit 2 ;;
+esac

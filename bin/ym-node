@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export NODE_PATH=/usr/lib/node_modules
+export ELECTRON_RUN_AS_NODE=1
+exec /usr/bin/electron34 "$@"

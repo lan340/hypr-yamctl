@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cmd="${1:-status}"
+YM_PLAYER_DEFAULT="${YM_PLAYER:-}"
+
+lower(){ tr '[:upper:]' '[:lower:]'; }
+
+pick_player() {
+  if [[ -n "$YM_PLAYER_DEFAULT" ]] && playerctl -p "$YM_PLAYER_DEFAULT" status &>/dev/null; then
+    echo "$YM_PLAYER_DEFAULT"; return 0
+  fi
+  mapfile -t cand < <(playerctl -l 2>/dev/null | grep -E '^chromium(\.|$)' || true)
+  ((${#cand[@]}==0)) && return 1
+
+  best=""; best_score=-999
+  for p in "${cand[@]}"; do
+    url="$(playerctl -p "$p" metadata xesam:url 2>/dev/null || true)"
+    st="$(playerctl -p "$p" status 2>/dev/null || true)"
+    url_l="$(printf %s "$url" | lower)"
+    st_l="$(printf %s "$st" | lower)"
+    score=0
+    [[ "$url_l" == *"music.yandex"* || "$url_l" == *"yandex.ru/music"* ]] && score=$((score+10))
+    case "$st_l" in playing) score=$((score+3));; paused) score=$((score+1));; esac
+    (( score > best_score )) && { best_score=$score; best="$p"; }
+  done
+
+  [[ -n "$best" ]] && playerctl -p "$best" status &>/dev/null && { echo "$best"; return 0; }
+  return 1
+}
+
+PLAYER="$(pick_player || true)" || exit 0
+[[ -z "${PLAYER:-}" ]] && exit 0
+
+# Служебное: вернуть имя выбранного плеера (chromium.instanceXXXX)
+case "${1:-}" in
+  player) echo "$PLAYER"; exit 0 ;;
+esac
+
+if [[ $# -eq 0 ]]; then
+  set -- status
+fi
+
+playerctl -p "$PLAYER" "$@"

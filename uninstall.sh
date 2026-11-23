@@ -62,7 +62,7 @@ rm -f "$HOME/.config/waybar/modules/ym_mpris.sh"
 STYLE_CSS="$HOME/.config/waybar/style.css"
 if [[ -f "$STYLE_CSS" ]]; then
     sed -i '/@import "yamusic\.css";/d' "$STYLE_CSS"
-    sed -i '/yamusic/d' "$STYLE_CSS" 2>/dev/null || true
+    sed -i '/@import.*yamusic/d' "$STYLE_CSS" 2>/dev/null || true
     success "Стили yamusic.css удалены из style.css"
 fi
 

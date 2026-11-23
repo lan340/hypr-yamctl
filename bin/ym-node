@@ -10,5 +10,6 @@ elif command -v electron &>/dev/null; then
 elif command -v node &>/dev/null; then
   exec node "$@"
 else
-  exec node "$@"
+  echo "ym-node: neither electron nor node found in PATH" >&2
+  exit 1
 fi

@@ -13,11 +13,6 @@ pango_escape() {
   sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
 }
 
-# Экраним для JSON: бэкслеш и двойные кавычки
-json_escape() {
-  sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
-}
-
 pick_player() {
   # 0) Если задан конкретный — используем его
   if [[ -n "$YM_PLAYER_DEFAULT" ]] && playerctl -p "$YM_PLAYER_DEFAULT" status &>/dev/null; then

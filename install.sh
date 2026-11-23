@@ -521,7 +521,7 @@ if [[ "$INSTALL_WAYBAR" == "true" ]]; then
         sleep 1
         if [[ -f "$HOME/.local/bin/waybar-single" ]]; then
             nohup "$HOME/.local/bin/waybar-single" >/dev/null 2>&1 &
-        else
+        elif command -v waybar &>/dev/null; then
             nohup waybar >/dev/null 2>&1 &
         fi
         success "Waybar перезапущен."

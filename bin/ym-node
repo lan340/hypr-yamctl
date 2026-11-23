@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
 export NODE_PATH=/usr/lib/node_modules
-export ELECTRON_RUN_AS_NODE=1
-exec /usr/bin/electron34 "$@"
+
+if command -v electron34 &>/dev/null; then
+  export ELECTRON_RUN_AS_NODE=1
+  exec electron34 "$@"
+elif command -v electron &>/dev/null; then
+  export ELECTRON_RUN_AS_NODE=1
+  exec electron "$@"
+elif command -v node &>/dev/null; then
+  exec node "$@"
+else
+  exec node "$@"
+fi

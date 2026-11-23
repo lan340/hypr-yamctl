@@ -1,11 +1,33 @@
 #!/usr/bin/env bash
-# Yandex Music через electron34 с DevTools + отдельный профиль, чтобы не склеивался со старым инстансом
+# Yandex Music запуск с DevTools + отдельный профиль отладки
 
 export ELECTRON_ENABLE_ACCESSIBILITY=1
 export GTK_MODULES=atk-bridge
 export NO_AT_BRIDGE=0
 
-exec /usr/lib/electron34/electron \
+ELECTRON_BIN=""
+for cand in /usr/lib/electron34/electron /usr/lib/electron/electron electron34 electron; do
+  if command -v "$cand" &>/dev/null || [[ -x "$cand" ]]; then
+    ELECTRON_BIN="$cand"
+    break
+  fi
+done
+
+if [[ -z "$ELECTRON_BIN" ]]; then
+  echo "Error: Electron binary not found." >&2
+  exit 1
+fi
+
+ASAR_PATH=""
+for cand in /usr/lib/yandex-music/yandex-music.asar /opt/yandex-music/resources/app.asar /opt/YandexMusic/resources/app.asar; do
+  if [[ -f "$cand" ]]; then
+    ASAR_PATH="$cand"
+    break
+  fi
+done
+ASAR_PATH="${ASAR_PATH:-/usr/lib/yandex-music/yandex-music.asar}"
+
+exec "$ELECTRON_BIN" \
   --remote-debugging-port=9222 \
   --remote-debugging-address=127.0.0.1 \
   --force-renderer-accessibility \
@@ -17,4 +39,4 @@ exec /usr/lib/electron34/electron \
   --fetch-schemes=music-application \
   --service-worker-schemes=music-application \
   --user-data-dir="$HOME/.config/yandex-music-devtools" \
-  /usr/lib/yandex-music/yandex-music.asar "$@"
+  "$ASAR_PATH" "$@"

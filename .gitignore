@@ -14,3 +14,7 @@ node_modules/
 
 # Waybar lock
 .waybar.lock
+
+# Python
+__pycache__/
+*.pyc

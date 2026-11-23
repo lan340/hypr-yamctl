@@ -178,6 +178,49 @@ def patch_section(bar_text, section, position, target_mod, mods_to_add):
         
     return bar_text[:m.start()] + start_header + new_inner + closing + bar_text[m.end():]
 
+def find_bar_spans(text):
+    spans = []
+    in_string = False
+    escape = False
+    in_line_comment = False
+    in_block_comment = False
+    array_depth = 0
+    obj_depth = 0
+    obj_start = -1
+    i = 0
+    n = len(text)
+    while i < n:
+        c = text[i]
+        if in_line_comment:
+            if c == '\n': in_line_comment = False
+            i += 1; continue
+        elif in_block_comment:
+            if c == '*' and i + 1 < n and text[i+1] == '/':
+                in_block_comment = False
+                i += 2; continue
+            i += 1; continue
+        elif in_string:
+            if escape: escape = False
+            elif c == '\\': escape = True
+            elif c == '"': in_string = False
+            i += 1; continue
+        if c == '/' and i + 1 < n:
+            if text[i+1] == '/': in_line_comment = True; i += 2; continue
+            elif text[i+1] == '*': in_block_comment = True; i += 2; continue
+        if c == '"': in_string = True
+        elif c == '[': array_depth += 1
+        elif c == ']': array_depth -= 1
+        elif c == '{':
+            if array_depth == 1 and obj_depth == 0: obj_start = i
+            obj_depth += 1
+        elif c == '}':
+            obj_depth -= 1
+            if array_depth == 1 and obj_depth == 0 and obj_start != -1:
+                spans.append((obj_start, i + 1))
+                obj_start = -1
+        i += 1
+    return spans
+
 def cmd_patch(config_path, bar_idx, section, position, target_mod, mods_csv, include_path):
     mods_to_add = [x.strip() for x in mods_csv.split(',') if x.strip()]
     if not mods_to_add:
@@ -192,13 +235,26 @@ def cmd_patch(config_path, bar_idx, section, position, target_mod, mods_csv, inc
         res_text = patch_section(res_text, section, position, target_mod, mods_to_add)
     else:
         res_text = raw_text
-        if "yamusic-modules.json" not in res_text:
-            bracket_pos = res_text.find('[')
-            if bracket_pos != -1:
-                brace_pos = res_text.find('{', bracket_pos)
-                if brace_pos != -1:
-                    res_text = res_text[:brace_pos+1] + f'\n        "include": ["{include_path}"],' + res_text[brace_pos+1:]
-        res_text = patch_section(res_text, section, position, target_mod, mods_to_add)
+        spans = find_bar_spans(res_text)
+        if spans:
+            if str(bar_idx).lower() == "all":
+                target_indices = list(range(len(spans)))
+            else:
+                try:
+                    idx = int(bar_idx)
+                    target_indices = [idx] if 0 <= idx < len(spans) else list(range(len(spans)))
+                except (ValueError, TypeError):
+                    target_indices = list(range(len(spans)))
+                    
+            for idx in reversed(target_indices):
+                s, e = spans[idx]
+                bar_text = res_text[s:e]
+                bar_text = insert_include_in_bar(bar_text, include_path)
+                bar_text = patch_section(bar_text, section, position, target_mod, mods_to_add)
+                res_text = res_text[:s] + bar_text + res_text[e:]
+        else:
+            res_text = insert_include_in_bar(res_text, include_path)
+            res_text = patch_section(res_text, section, position, target_mod, mods_to_add)
         
     try:
         clean = strip_jsonc(res_text)

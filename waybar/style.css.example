@@ -336,11 +336,11 @@ label:focus {
 
 /* разные картинки по классам */
 #custom-mpris_heart.unliked {
-  background-image: url("file:///home/lan/.config/waybar/svg/heart-dis.svg");
+  background-image: url("svg/heart-dis.svg");
   background-color: #111827;
 }
 #custom-mpris_heart.liked {
-  background-image: url("file:///home/lan/.config/waybar/svg/heart-like.svg");
+  background-image: url("svg/heart-like.svg");
   background-color: #111827;
 }
 /* те же стили, что были у #mpris */
@@ -355,42 +355,42 @@ label:focus {
   font-size: 13px;
 }
 /*#custom-ym_mpris.playing {
-  background-image: url("file:///home/lan/.config/waybar/svg/play.svg");
+  background-image: url("svg/play.svg");
   padding-left: 10px;
 }
 #custom-ym_mpris.paused-p0 {
-  background-image: url("file:///home/lan/.config/waybar/svg/stop.svg");
+  background-image: url("svg/stop.svg");
   padding-left: 40px;
   background-position: 12px center;
 }*/
 #custom-ym_mpris.stopped {
-  background-image: url("file:///home/lan/.config/waybar/svg/stop.svg");
+  background-image: url("svg/stop.svg");
 }
 
 /* playing/paused + прогресс (шаг 10%) — одна картинка на каждое правило */
-#custom-ym_mpris.paused-p0   { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-00.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p10  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-10.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p20  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-20.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p30  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-30.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p40  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-40.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p50  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-50.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p60  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-60.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p70  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-70.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p80  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-80.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p90  { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-90.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.paused-p100 { background-image: url("file:///home/lan/.config/waybar/svg/prog_play/play-100.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p0   { background-image: url("svg/prog_play/play-00.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p10  { background-image: url("svg/prog_play/play-10.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p20  { background-image: url("svg/prog_play/play-20.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p30  { background-image: url("svg/prog_play/play-30.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p40  { background-image: url("svg/prog_play/play-40.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p50  { background-image: url("svg/prog_play/play-50.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p60  { background-image: url("svg/prog_play/play-60.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p70  { background-image: url("svg/prog_play/play-70.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p80  { background-image: url("svg/prog_play/play-80.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p90  { background-image: url("svg/prog_play/play-90.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.paused-p100 { background-image: url("svg/prog_play/play-100.svg"); padding-left: 50px; background-position: 12px center; }
 
-#custom-ym_mpris.playing-p0   { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-00.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.playing-p10  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-10.svg"); padding-left: 50px; background-position: 12px center; }
-#custom-ym_mpris.playing-p20  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-20.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p30  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-30.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p40  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-40.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p50  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-50.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p60  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-60.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p70  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-70.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p80  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-80.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p90  { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-90.svg"); padding-left: 50px; background-position: 12px center;  }
-#custom-ym_mpris.playing-p100 { background-image: url("file:///home/lan/.config/waybar/svg/prog_pause/pause-100.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p0   { background-image: url("svg/prog_pause/pause-00.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p10  { background-image: url("svg/prog_pause/pause-10.svg"); padding-left: 50px; background-position: 12px center; }
+#custom-ym_mpris.playing-p20  { background-image: url("svg/prog_pause/pause-20.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p30  { background-image: url("svg/prog_pause/pause-30.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p40  { background-image: url("svg/prog_pause/pause-40.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p50  { background-image: url("svg/prog_pause/pause-50.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p60  { background-image: url("svg/prog_pause/pause-60.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p70  { background-image: url("svg/prog_pause/pause-70.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p80  { background-image: url("svg/prog_pause/pause-80.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p90  { background-image: url("svg/prog_pause/pause-90.svg"); padding-left: 50px; background-position: 12px center;  }
+#custom-ym_mpris.playing-p100 { background-image: url("svg/prog_pause/pause-100.svg"); padding-left: 50px; background-position: 12px center;  }
 
 #custom-ym_mpris.playing,
 #custom-ym_mpris.paused {

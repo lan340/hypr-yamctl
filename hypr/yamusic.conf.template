@@ -13,6 +13,6 @@ bindd = $ymMod, {{KEY_NEXT}}, Next track, exec, sh -c "~/.local/bin/ym_playerctl
 bindd = $ymMod, {{KEY_PREV}}, Previous track, exec, sh -c "~/.local/bin/ym_playerctl previous; pkill -x -RTMIN+6 waybar"
 
 # Internal volume control (Mod + Shift + Wheel / Middle click)
-bindd = $ymMod SHIFT, mouse_up,   YM volume +5, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/down?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
-bindd = $ymMod SHIFT, mouse_down, YM volume -5, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/up?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
+bindd = $ymMod SHIFT, mouse_up,   YM volume +2%, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/up?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
+bindd = $ymMod SHIFT, mouse_down, YM volume -2%, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/down?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
 bindd = $ymMod SHIFT, mouse:274,  YM mute,      exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/mute' >/dev/null; pkill -x -RTMIN+8 waybar"

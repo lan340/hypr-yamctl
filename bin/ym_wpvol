@@ -4,7 +4,7 @@ set -euo pipefail
 action="${1:-up}"   # up | down | mute
 step="${2:-5%}"     # 5% / 2% / 10%
 
-player="$("$HOME/.local/bin/ym_playerctl" player 2>/dev/null || true)"
+player="$(command -v ym_playerctl &>/dev/null && ym_playerctl player 2>/dev/null || "$HOME/.local/bin/ym_playerctl" player 2>/dev/null || true)"
 [[ -z "${player:-}" ]] && exit 0
 
 # 1) PID: сначала пробуем mpris:pid, потом D-Bus

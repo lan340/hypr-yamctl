@@ -10,8 +10,8 @@ bindd = $mainMod, RETURN, Opens your preferred terminal emulator ($terminal), ex
 bindd = $mainMod, E, Opens your preferred filemanager ($filemanager), exec, $filemanager
 bindd = $mainMod SHIFT, E, Opens your panel zadach ($zadachi), exec, $zadachi
 # Yandex Music internal volume (Win+Shift+Wheel)
-bindd = $mainMod SHIFT, mouse_up,   YM volume +5, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/down?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
-bindd = $mainMod SHIFT, mouse_down, YM volume -5, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/up?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
+bindd = $mainMod SHIFT, mouse_up,   YM volume +2%, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/up?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
+bindd = $mainMod SHIFT, mouse_down, YM volume -2%, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/down?step=2' >/dev/null; pkill -x -RTMIN+8 waybar"
 bindd = $mainMod SHIFT, mouse:274, YM mute, exec, sh -c "curl -m 1 -fsS -X POST 'http://127.0.0.1:17312/ymvol/mute' >/dev/null; pkill -x -RTMIN+8 waybar"
 bindd = $mainMod, grave, like ya.muzic, exec, sh -c "curl -m 1 -fsS -X POST http://127.0.0.1:17311/toggle >/dev/null; pkill -x -RTMIN+7 waybar"
 bindd = $mainMod, Z, previous, exec, sh -c "~/.local/bin/ym_playerctl previous; pkill -x -RTMIN+6 waybar"
@@ -26,7 +26,7 @@ bindd = $mainMod, F, Toggles current window fullscreen mode, fullscreen
 bindd = $mainMod, Y, Pin current window (shows on all workspaces),pin
 bindd = $mainMod, J, Toggles curren window split mode, layoutmsg, togglesplit # dwindle
 bindd = $mainMod, N, nekobox, exec, /usr/lib/nekoray/nekobox
-bindd = $mainMod, Print, Take screenshot, exec, /home/lan/.config/hypr/scripts/screenshot_area
+bindd = $mainMod, Print, Take screenshot, exec, ~/.config/hypr/scripts/screenshot_area
 
 # ======= Grouping Windows =======
 bindd = $mainMod, K, Toggles current window group mode (ungroup all related), togglegroup,

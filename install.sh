@@ -426,18 +426,19 @@ cp "$SCRIPT_DIR/bin/"* "$HOME/.local/bin/"
 chmod +x "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym 2>/dev/null || true
 
 # Генерация ym-node
+NODE_BIN_PATH="$(command -v "$NODE_EXEC" || echo "$NODE_EXEC")"
 if [[ "$NODE_EXEC" == "electron34" || "$NODE_EXEC" == "electron" ]]; then
     cat << EOF > "$HOME/.local/bin/ym-node"
 #!/usr/bin/env bash
 export NODE_PATH=/usr/lib/node_modules
 export ELECTRON_RUN_AS_NODE=1
-exec /usr/bin/$NODE_EXEC "\$@"
+exec "$NODE_BIN_PATH" "\$@"
 EOF
 else
     cat << EOF > "$HOME/.local/bin/ym-node"
 #!/usr/bin/env bash
 export NODE_PATH=/usr/lib/node_modules
-exec /usr/bin/node "\$@"
+exec "$NODE_BIN_PATH" "\$@"
 EOF
 fi
 chmod +x "$HOME/.local/bin/ym-node"

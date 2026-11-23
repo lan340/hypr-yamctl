@@ -70,8 +70,10 @@ idn="$(playerctl -p "$PLAYER" metadata mpris:identity 2>/dev/null || true)"
 
 # --- прогресс для выбора SVG bar pXX ---
 # position → секунды (float); переводим в микросекунды (int)
-pos_us="$(playerctl -p "$PLAYER" position 2>/dev/null | awk '{print int($1*1000000)}' || echo 0)"
-len_us="$(playerctl -p "$PLAYER" metadata mpris:length 2>/dev/null || echo 0)"
+pos_us="$(playerctl -p "$PLAYER" position 2>/dev/null | awk '{print int($1*1000000)}' | tr -cd '0-9' || true)"
+len_us="$(playerctl -p "$PLAYER" metadata mpris:length 2>/dev/null | tr -cd '0-9' || true)"
+pos_us="${pos_us:-0}"
+len_us="${len_us:-0}"
 
 pct=0
 if [[ "$len_us" -gt 0 && "$pos_us" -ge 0 ]]; then
@@ -94,17 +96,12 @@ else
   two_lines="$title_pango"
 fi
 
-# Превращаем многострочный текст в JSON-safe одной строкой (\n внутри строки)
-text="$(printf '%s' "$two_lines" \
-  | sed -e ':a;N;$!ba;s/\n/__NL__/g' \
-        -e 's/\\/\\\\/g' \
-        -e 's/"/\\"/g' \
-        -e 's/__NL__/\\n/g')"
-
-album_esc="$(printf '%s' "$album" | json_escape)"
-idn_esc="$(printf '%s' "$idn"   | json_escape)"
-
 class_out="$status-p$bucket"
+tooltip="${idn:+$idn: }$album"
 
-printf '{"text":"%s","class":"%s","alt":"%s","tooltip":"%s: %s"}\n' \
-  "$text" "$class_out" "$PLAYER" "$idn_esc" "$album_esc"
+jq -nc \
+  --arg text "$two_lines" \
+  --arg class "$class_out" \
+  --arg alt "$PLAYER" \
+  --arg tooltip "$tooltip" \
+  '{text: $text, class: $class, alt: $alt, tooltip: $tooltip}'

@@ -72,7 +72,7 @@ rm -f "$HYPR_CONF"
 
 HYPRLAND_MAIN="$HOME/.config/hypr/hyprland.conf"
 if [[ -f "$HYPRLAND_MAIN" ]]; then
-    sed -i '/source = ~\/config\/hypr\/yamusic\.conf/d' "$HYPRLAND_MAIN"
+    sed -i '/source = ~\/.config\/hypr\/yamusic\.conf/d' "$HYPRLAND_MAIN"
     sed -i '/yamusic\.conf/d' "$HYPRLAND_MAIN"
     success "Привязка yamusic.conf удалена из $HYPRLAND_MAIN."
 fi
@@ -84,7 +84,9 @@ rm -f "$HOME/.local/bin/ym-node" \
       "$HOME/.local/bin/ym-vol-watch.js" \
       "$HOME/.local/bin/ym_playerctl" \
       "$HOME/.local/bin/ym_wpvol" \
-      "$HOME/.local/bin/mpris-ym"
+      "$HOME/.local/bin/mpris-ym" \
+      "$HOME/.local/bin/yandex-music" \
+      "$HOME/.local/bin/waybar-single"
 success "Бинарные файлы удалены."
 
 # 5. Check if user wants to restore latest backup
@@ -94,7 +96,7 @@ if [[ -n "$LATEST_BAK" && -f "$LATEST_BAK" ]]; then
     warn "Обнаружена резервная копия конфига: $LATEST_BAK"
     echo -n "Восстановить конфиг Waybar из этой резервной копии? [y/N]: "
     read -r ans_bak
-    if [[ "$ans_bak" =~ ^[Yy]$ ]]; then
+    if [[ "$ans_bak" =~ ^[Yy]$ ]] && [[ -n "${WAYBAR_CONFIG:-}" ]]; then
         cp "$LATEST_BAK" "$WAYBAR_CONFIG"
         success "Конфиг Waybar восстановлен из $LATEST_BAK."
     fi
@@ -109,7 +111,7 @@ if [[ "${ans_bar:-y}" =~ ^[Yy]?$ ]]; then
     sleep 1
     if [[ -f "$HOME/.local/bin/waybar-single" ]]; then
         nohup "$HOME/.local/bin/waybar-single" >/dev/null 2>&1 &
-    else
+    elif command -v waybar &>/dev/null; then
         nohup waybar >/dev/null 2>&1 &
     fi
     success "Waybar перезапущен."

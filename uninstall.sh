@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =========================================================================
-# Yandex Music Waybar & Hyprland Uninstaller
+# hypr-yamctl — Waybar & Hyprland Uninstaller
 # Cleanly removes all components and restores original configuration
 # =========================================================================
 
@@ -18,7 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo -e "${RED}${BOLD}"
 cat << 'EOF'
  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
- ┃          Yandex Music -> Waybar & Hyprland Uninstaller      ┃
+ ┃                   hypr-yamctl Uninstaller                   ┃
  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 EOF
 echo -e "${RESET}"
@@ -54,32 +54,34 @@ if [[ -n "$WAYBAR_CONFIG" ]]; then
 fi
 
 # Remove modular waybar files
-rm -f "$HOME/.config/waybar/yamusic-modules.json"
-rm -f "$HOME/.config/waybar/yamusic.css"
+rm -f "$HOME/.config/waybar/hypr-yamctl-modules.json" "$HOME/.config/waybar/yamusic-modules.json"
+rm -f "$HOME/.config/waybar/hypr-yamctl.css" "$HOME/.config/waybar/yamusic.css"
 rm -f "$HOME/.config/waybar/modules/ym_mpris.sh"
 
 # Remove @import from style.css
 STYLE_CSS="$HOME/.config/waybar/style.css"
 if [[ -f "$STYLE_CSS" ]]; then
-    sed -i '/@import "yamusic\.css";/d' "$STYLE_CSS"
+    sed -i '/@import.*hypr-yamctl/d' "$STYLE_CSS" 2>/dev/null || true
     sed -i '/@import.*yamusic/d' "$STYLE_CSS" 2>/dev/null || true
-    success "Стили yamusic.css удалены из style.css"
+    success "Стили hypr-yamctl удалены из style.css"
 fi
 
 # 3. Unpatch Hyprland
-HYPR_CONF="$HOME/.config/hypr/yamusic.conf"
-rm -f "$HYPR_CONF"
+rm -f "$HOME/.config/hypr/hypr-yamctl.conf" "$HOME/.config/hypr/yamusic.conf"
 
 HYPRLAND_MAIN="$HOME/.config/hypr/hyprland.conf"
 if [[ -f "$HYPRLAND_MAIN" ]]; then
-    sed -i '/source = ~\/.config\/hypr\/yamusic\.conf/d' "$HYPRLAND_MAIN"
-    sed -i '/yamusic\.conf/d' "$HYPRLAND_MAIN"
-    success "Привязка yamusic.conf удалена из $HYPRLAND_MAIN."
+    sed -i '/source = .*hypr-yamctl\.conf/d' "$HYPRLAND_MAIN"
+    sed -i '/source = .*yamusic\.conf/d' "$HYPRLAND_MAIN"
+    sed -i '/hypr-yamctl\.conf/d' "$HYPRLAND_MAIN" 2>/dev/null || true
+    sed -i '/yamusic\.conf/d' "$HYPRLAND_MAIN" 2>/dev/null || true
+    success "Привязка hypr-yamctl.conf удалена из $HYPRLAND_MAIN."
 fi
 
 # 4. Remove binaries from ~/.local/bin
 info "Удаление скриптов из ~/.local/bin/..."
-rm -f "$HOME/.local/bin/ym-node" \
+rm -f "$HOME/.local/bin/hypr-yamctl" \
+      "$HOME/.local/bin/ym-node" \
       "$HOME/.local/bin/ym-like-watch.js" \
       "$HOME/.local/bin/ym-vol-watch.js" \
       "$HOME/.local/bin/ym_playerctl" \

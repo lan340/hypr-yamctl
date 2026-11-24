@@ -88,7 +88,7 @@ def cmd_scan(config_path):
         if isinstance(inc, list): includes.extend(inc)
         elif isinstance(inc, str): includes.append(inc)
         
-    has_include = any("yamusic" in str(x) for x in includes)
+    has_include = any(("yamusic" in str(x) or "hypr-yamctl" in str(x)) for x in includes)
     if has_include:
         already_installed = True
         
@@ -103,7 +103,7 @@ def cmd_scan(config_path):
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
 def insert_include_in_bar(bar_text, include_path):
-    if "yamusic-modules.json" in bar_text:
+    if "hypr-yamctl-modules.json" in bar_text or "yamusic-modules.json" in bar_text or include_path in bar_text:
         return bar_text
         
     inc_match = re.search(r'("include"\s*:\s*\[)', bar_text)
@@ -268,7 +268,7 @@ def cmd_patch(config_path, bar_idx, section, position, target_mod, mods_csv, inc
         
     print("SUCCESS")
 
-def cmd_unpatch(config_path, include_filename="yamusic-modules.json"):
+def cmd_unpatch(config_path, include_filename="hypr-yamctl-modules.json"):
     raw_text, data = parse_config(config_path)
     
     ym_mods = [
@@ -281,7 +281,9 @@ def cmd_unpatch(config_path, include_filename="yamusic-modules.json"):
     for ym in ym_mods:
         text = re.sub(ym, '', text)
         
-    text = re.sub(rf'[ \t]*"[^"]*{include_filename}"[ \t]*,?\n?', '', text)
+    text = re.sub(r'[ \t]*"[^"]*(?:hypr-yamctl-modules|yamusic-modules)\.json"[ \t]*,?\n?', '', text)
+    if include_filename and include_filename not in ["hypr-yamctl-modules.json", "yamusic-modules.json"]:
+        text = re.sub(rf'[ \t]*"[^"]*{include_filename}"[ \t]*,?\n?', '', text)
     text = re.sub(r'"include"\s*:\s*\[\s*\]\s*,?\n?', '', text)
     
     # Strip any trailing commas before closing bracket (even with comments)

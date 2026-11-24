@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+# =========================================================================
+# hypr-yamctl — Unified CLI for Yandex Music in Hyprland & Waybar
+# =========================================================================
+
+set -euo pipefail
+
+# Colors
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Helper to locate binaries (PATH first, then fallback to ~/.local/bin or SCRIPT_DIR)
+find_bin() {
+    local name="$1"
+    if command -v "$name" &>/dev/null; then
+        echo "$name"
+    elif [[ -x "$HOME/.local/bin/$name" ]]; then
+        echo "$HOME/.local/bin/$name"
+    elif [[ -x "$SCRIPT_DIR/$name" ]]; then
+        echo "$SCRIPT_DIR/$name"
+    else
+        echo "$name"
+    fi
+}
+
+YM_PLAYERCTL="$(find_bin ym_playerctl)"
+YM_WPVOL="$(find_bin ym_wpvol)"
+
+signal_waybar() {
+    local sig="$1"
+    pkill -x "-RTMIN+${sig}" waybar 2>/dev/null || true
+}
+
+cmd_play_pause() {
+    "$YM_PLAYERCTL" play-pause 2>/dev/null || true
+    signal_waybar 6
+}
+
+cmd_next() {
+    "$YM_PLAYERCTL" next 2>/dev/null || true
+    signal_waybar 6
+}
+
+cmd_prev() {
+    "$YM_PLAYERCTL" previous 2>/dev/null || true
+    signal_waybar 6
+}
+
+cmd_like() {
+    curl -m 1 -fsS -X POST http://127.0.0.1:17311/toggle >/dev/null 2>&1 || true
+    signal_waybar 7
+}
+
+cmd_volume() {
+    local subaction="${1:-}"
+    shift || true
+
+    case "$subaction" in
+        up|\+*)
+            local step="${1:-}"
+            [[ -z "$step" && "$subaction" =~ ^\+([0-9]+) ]] && step="${BASH_REMATCH[1]}"
+            step="${step:-2}"
+            if ! curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/up?step=${step}" >/dev/null 2>&1; then
+                "$YM_WPVOL" up "${step}%" 2>/dev/null || true
+            fi
+            ;;
+        down|\-*)
+            local step="${1:-}"
+            [[ -z "$step" && "$subaction" =~ ^\-([0-9]+) ]] && step="${BASH_REMATCH[1]}"
+            step="${step:-2}"
+            if ! curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/down?step=${step}" >/dev/null 2>&1; then
+                "$YM_WPVOL" down "${step}%" 2>/dev/null || true
+            fi
+            ;;
+        mute|toggle-mute)
+            if ! curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/mute" >/dev/null 2>&1; then
+                "$YM_WPVOL" mute 2>/dev/null || true
+            fi
+            ;;
+        set)
+            local pct="${1:-50}"
+            curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/set?pct=${pct}" >/dev/null 2>&1 || true
+            ;;
+        *)
+            echo "Использование: hypr-yamctl volume [up <step> | down <step> | mute | set <pct>]" >&2
+            return 1
+            ;;
+    esac
+    signal_waybar 8
+}
+
+cmd_start() {
+    echo -e "${BLUE}[INFO]${RESET} Запуск служб hypr-yamctl..."
+    systemctl --user start ym-like-watch.service ym-vol-watch.service
+    signal_waybar 6; signal_waybar 7; signal_waybar 8
+    echo -e "${GREEN}[✓]${RESET} Фоновые службы запущены."
+}
+
+cmd_stop() {
+    echo -e "${BLUE}[INFO]${RESET} Остановка служб hypr-yamctl..."
+    systemctl --user stop ym-like-watch.service ym-vol-watch.service
+    signal_waybar 6; signal_waybar 7; signal_waybar 8
+    echo -e "${YELLOW}[!]${RESET} Фоновые службы остановлены."
+}
+
+cmd_restart() {
+    echo -e "${BLUE}[INFO]${RESET} Перезапуск служб hypr-yamctl..."
+    systemctl --user restart ym-like-watch.service ym-vol-watch.service
+    signal_waybar 6; signal_waybar 7; signal_waybar 8
+    echo -e "${GREEN}[✓]${RESET} Службы успешно перезапущены."
+}
+
+cmd_status() {
+    echo -e "${CYAN}${BOLD}=== hypr-yamctl status ===${RESET}"
+
+    # 1. systemd daemons
+    local like_st vol_st
+    like_st="$(systemctl --user is-active ym-like-watch.service 2>/dev/null || echo "inactive")"
+    vol_st="$(systemctl --user is-active ym-vol-watch.service 2>/dev/null || echo "inactive")"
+
+    if [[ "$like_st" == "active" ]]; then
+        echo -e "  • Демон лайков (17311)  : ${GREEN}активен${RESET}"
+    else
+        echo -e "  • Демон лайков (17311)  : ${RED}остановлен (${like_st})${RESET}"
+    fi
+
+    if [[ "$vol_st" == "active" ]]; then
+        echo -e "  • Демон громкости (17312): ${GREEN}активен${RESET}"
+    else
+        echo -e "  • Демон громкости (17312): ${RED}остановлен (${vol_st})${RESET}"
+    fi
+
+    # 2. CDP Port 9222
+    if curl -m 1 -fsS http://127.0.0.1:9222/json/version &>/dev/null; then
+        echo -e "  • Порт отладки (9222)   : ${GREEN}доступен (Яндекс Музыка подключена)${RESET}"
+    else
+        echo -e "  • Порт отладки (9222)   : ${YELLOW}не отвечает (запустите через 'hypr-yamctl launch')${RESET}"
+    fi
+
+    # 3. MPRIS player
+    local player
+    player="$("$YM_PLAYERCTL" player 2>/dev/null || true)"
+    if [[ -n "$player" ]]; then
+        local st title artist
+        st="$(playerctl -p "$player" status 2>/dev/null || echo "Unknown")"
+        title="$(playerctl -p "$player" metadata xesam:title 2>/dev/null || echo "—")"
+        artist="$(playerctl -p "$player" metadata xesam:artist 2>/dev/null || echo "—")"
+        echo -e "  • Плеер MPRIS           : ${GREEN}$player [$st]${RESET}"
+        echo -e "  • Текущий трек          : ${BOLD}$title${RESET} — $artist"
+    else
+        echo -e "  • Плеер MPRIS           : ${YELLOW}не обнаружен${RESET}"
+    fi
+}
+
+cmd_launch() {
+    local yandex_music_bin
+    yandex_music_bin="$(find_bin yandex-music)"
+    if [[ -x "$yandex_music_bin" ]]; then
+        echo -e "${BLUE}[INFO]${RESET} Запуск Яндекс Музыки с отладкой..."
+        nohup "$yandex_music_bin" >/dev/null 2>&1 &
+        echo -e "${GREEN}[✓]${RESET} Приложение запущено в фоне."
+    else
+        echo -e "${RED}[ERROR]${RESET} Скрипт yandex-music не найден." >&2
+        return 1
+    fi
+}
+
+cmd_help() {
+    echo -e "${BOLD}hypr-yamctl${RESET} — Единая утилита управления Яндекс Музыкой для Hyprland & Waybar
+
+${BOLD}Использование:${RESET}
+  hypr-yamctl <команда> [параметры]
+
+${BOLD}Управление воспроизведением:${RESET}
+  play-pause, play, pause, toggle   Переключить воспроизведение / паузу
+  next                              Следующий трек
+  prev, previous                    Предыдущий трек
+  like, toggle-like                 Поставить или снять лайк с текущего трека
+
+${BOLD}Управление громкостью:${RESET}
+  volume up [step] (или +2, +5)     Увеличить громкость (по умолчанию на 2%)
+  volume down [step] (или -2, -5)   Уменьшить громкость (по умолчанию на 2%)
+  volume mute                       Заглушить / включить звук
+  volume set <0-100>                Установить громкость в процентах
+
+${BOLD}Управление службами:${RESET}
+  status                            Статус фоновых демонов, порта 9222 и трека
+  start                             Запустить фоновые службы демонов
+  stop                              Полностью остановить фоновые службы
+  restart                           Перезапустить фоновые службы
+  launch, app                       Запустить Яндекс Музыку с портом отладки 9222
+
+${BOLD}Справка:${RESET}
+  help, --help, -h                  Показать эту справку"
+}
+
+# --- Main Dispatcher ---
+ACTION="${1:-help}"
+shift || true
+
+case "$ACTION" in
+    play-pause|play|pause|toggle)
+        cmd_play_pause
+        ;;
+    next)
+        cmd_next
+        ;;
+    prev|previous)
+        cmd_prev
+        ;;
+    like|toggle-like)
+        cmd_like
+        ;;
+    vol|volume)
+        cmd_volume "$@"
+        ;;
+    +*|-*)
+        cmd_volume "$ACTION" "$@"
+        ;;
+    start)
+        cmd_start
+        ;;
+    stop)
+        cmd_stop
+        ;;
+    restart)
+        cmd_restart
+        ;;
+    status)
+        cmd_status
+        ;;
+    launch|app)
+        cmd_launch
+        ;;
+    help|--help|-h)
+        cmd_help
+        ;;
+    *)
+        echo -e "${RED}Неизвестная команда:${RESET} $ACTION" >&2
+        cmd_help >&2
+        exit 1
+        ;;
+esac

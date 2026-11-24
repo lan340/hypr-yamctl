@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =========================================================================
-# Yandex Music Waybar & Hyprland Installer
+# hypr-yamctl — Waybar & Hyprland Installer
 # Interactive, non-destructive installer with custom placement, hotkeys,
 # automatic dependency resolution, and selective component installation.
 # =========================================================================
@@ -23,7 +23,7 @@ TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 echo -e "${CYAN}${BOLD}"
 cat << 'EOF'
  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
- ┃           Yandex Music -> Waybar & Hyprland Installer       ┃
+ ┃                    hypr-yamctl Installer                    ┃
  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 EOF
 echo -e "${RESET}"
@@ -92,8 +92,18 @@ if [[ ${#MISSING_DEPS[@]} -gt 0 ]]; then
         echo -n "Хотите установить их автоматически через $PKG_MANAGER? [Y/n]: "
         read -r ans
         if [[ "${ans:-y}" =~ ^[Yy]?$ ]]; then
+            if [[ "$PKG_MANAGER" =~ ^(pacman|dnf|apt)$ ]]; then
+                info "Для установки пакетов требуются права sudo. Пожалуйста, введите пароль:"
+                if ! sudo -v; then
+                    error "Не удалось получить права sudo. Установка отменена."
+                    exit 1
+                fi
+            fi
             info "Запуск установки: $INSTALL_CMD ${MISSING_DEPS[*]}..."
-            $INSTALL_CMD "${MISSING_DEPS[@]}"
+            if ! $INSTALL_CMD "${MISSING_DEPS[@]}"; then
+                error "Ошибка при установке пакетов через $PKG_MANAGER. Пожалуйста, установите ${MISSING_DEPS[*]} вручную."
+                exit 1
+            fi
             success "Пакеты успешно установлены."
         else
             error "Пожалуйста, установите ${MISSING_DEPS[*]} вручную и перезапустите скрипт."
@@ -133,10 +143,14 @@ if [[ "$WS_OK" == "false" ]]; then
         echo -n "Установить глобально через npm (sudo npm i -g ws)? [Y/n]: "
         read -r ans_npm
         if [[ "${ans_npm:-y}" =~ ^[Yy]?$ ]]; then
-            info "Установка ws через npm..."
-            sudo npm i -g ws
-            WS_OK=true
-            success "Библиотека ws успешно установлена."
+            info "Для глобальной установки npm требуются права sudo. Введите пароль:"
+            sudo -v || true
+            if sudo npm i -g ws; then
+                WS_OK=true
+                success "Библиотека ws успешно установлена."
+            else
+                warn "Не удалось установить ws глобально."
+            fi
         else
             warn "Без ws служба лайков не сможет подключиться к плееру."
         fi
@@ -398,6 +412,15 @@ if [[ "$INSTALL_HYPR" == "true" ]]; then
 else
     echo "  • Hyprland:       Пропущен (не настраивается)"
 fi
+echo ""
+echo -e "${YELLOW}${BOLD}Резервные копии будут созданы перед внесением изменений:${RESET}"
+if [[ "$INSTALL_WAYBAR" == "true" && -n "$WAYBAR_CONFIG" ]]; then
+    echo -e "  • Конфиг Waybar : ${CYAN}$WAYBAR_CONFIG.bak.$TIMESTAMP${RESET}"
+    [[ -f "$HOME/.config/waybar/style.css" ]] && echo -e "  • Стили Waybar  : ${CYAN}$HOME/.config/waybar/style.css.bak.$TIMESTAMP${RESET}"
+fi
+if [[ "$INSTALL_HYPR" == "true" && -f "$HOME/.config/hypr/hyprland.conf" ]]; then
+    echo -e "  • Конфиг Hypr   : ${CYAN}$HOME/.config/hypr/hyprland.conf.bak.$TIMESTAMP${RESET}"
+fi
 echo -e "${MAGENTA}${BOLD}------------------------------------------------------${RESET}"
 echo -n "Применить все изменения? [Y/n]: "
 read -r confirm
@@ -423,7 +446,7 @@ success "Резервные копии созданы с суффиксом .bak
 # 1. Установка исполняемых файлов в ~/.local/bin/
 info "Установка скриптов в ~/.local/bin/..."
 cp "$SCRIPT_DIR/bin/"* "$HOME/.local/bin/"
-chmod +x "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym 2>/dev/null || true
+chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym 2>/dev/null || true
 
 # Генерация ym-node
 NODE_BIN_PATH="$(command -v "$NODE_EXEC" || echo "$NODE_EXEC")"
@@ -452,19 +475,19 @@ if [[ "$INSTALL_WAYBAR" == "true" ]]; then
     cp "$SCRIPT_DIR/waybar/modules/ym_mpris.sh" "$HOME/.config/waybar/modules/"
     chmod +x "$HOME/.config/waybar/modules/ym_mpris.sh"
 
-    cp "$SCRIPT_DIR/waybar/yamusic-modules.json" "$HOME/.config/waybar/yamusic-modules.json"
+    cp "$SCRIPT_DIR/waybar/hypr-yamctl-modules.json" "$HOME/.config/waybar/hypr-yamctl-modules.json"
 
     SVG_ESC_DIR="$HOME/.config/waybar/svg"
-    sed "s|{{SVG_DIR}}|$SVG_ESC_DIR|g" "$SCRIPT_DIR/waybar/yamusic.css.template" > "$HOME/.config/waybar/yamusic.css"
+    sed "s|{{SVG_DIR}}|$SVG_ESC_DIR|g" "$SCRIPT_DIR/waybar/hypr-yamctl.css.template" > "$HOME/.config/waybar/hypr-yamctl.css"
 
     STYLE_CSS="$HOME/.config/waybar/style.css"
     if [[ -f "$STYLE_CSS" ]]; then
-        if ! grep -q "yamusic.css" "$STYLE_CSS"; then
-            echo -e '\n@import "yamusic.css";' >> "$STYLE_CSS"
-            success "Импорт yamusic.css добавлен в style.css"
+        if ! grep -q "hypr-yamctl.css" "$STYLE_CSS"; then
+            echo -e '\n@import "hypr-yamctl.css";' >> "$STYLE_CSS"
+            success "Импорт hypr-yamctl.css добавлен в style.css"
         fi
     else
-        echo '@import "yamusic.css";' > "$STYLE_CSS"
+        echo '@import "hypr-yamctl.css";' > "$STYLE_CSS"
     fi
 
     info "Инъекция модулей в $WAYBAR_CONFIG..."
@@ -475,7 +498,7 @@ if [[ "$INSTALL_WAYBAR" == "true" ]]; then
         "$POSITION" \
         "$TARGET_MODULE" \
         "$MODS_CSV" \
-        "$HOME/.config/waybar/yamusic-modules.json"
+        "$HOME/.config/waybar/hypr-yamctl-modules.json"
     success "Конфигурация Waybar успешно обновлена."
 fi
 
@@ -483,19 +506,19 @@ fi
 if [[ "$INSTALL_HYPR" == "true" ]]; then
     info "Настройка горячих клавиш Hyprland..."
     mkdir -p "$HOME/.config/hypr"
-    HYPR_CONF="$HOME/.config/hypr/yamusic.conf"
+    HYPR_CONF="$HOME/.config/hypr/hypr-yamctl.conf"
     sed -e "s|{{MODIFIER}}|$HYPR_MOD|g" \
         -e "s|{{KEY_LIKE}}|$KEY_LIKE|g" \
         -e "s|{{KEY_PLAY}}|$KEY_PLAY|g" \
         -e "s|{{KEY_NEXT}}|$KEY_NEXT|g" \
         -e "s|{{KEY_PREV}}|$KEY_PREV|g" \
-        "$SCRIPT_DIR/hypr/yamusic.conf.template" > "$HYPR_CONF"
+        "$SCRIPT_DIR/hypr/hypr-yamctl.conf.template" > "$HYPR_CONF"
 
     HYPRLAND_MAIN="$HOME/.config/hypr/hyprland.conf"
     if [[ -f "$HYPRLAND_MAIN" ]]; then
-        if ! grep -q "yamusic.conf" "$HYPRLAND_MAIN"; then
-            echo -e '\nsource = ~/.config/hypr/yamusic.conf' >> "$HYPRLAND_MAIN"
-            success "Подключение yamusic.conf добавлено в $HYPRLAND_MAIN"
+        if ! grep -q "hypr-yamctl.conf" "$HYPRLAND_MAIN"; then
+            echo -e '\nsource = ~/.config/hypr/hypr-yamctl.conf' >> "$HYPRLAND_MAIN"
+            success "Подключение hypr-yamctl.conf добавлено в $HYPRLAND_MAIN"
         fi
     fi
 fi

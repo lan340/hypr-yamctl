@@ -1,0 +1,18 @@
+# =========================================================================
+# hypr-yamctl — Hyprland Keybindings
+# =========================================================================
+
+$ymMod = {{MODIFIER}}
+
+# Like current track (Default: Mod + `)
+bindd = $ymMod, {{KEY_LIKE}}, Like current track, exec, hypr-yamctl like
+
+# Playback controls (Default: Mod + X, C, Z)
+bindd = $ymMod, {{KEY_PLAY}}, Play/Pause, exec, hypr-yamctl play-pause
+bindd = $ymMod, {{KEY_NEXT}}, Next track, exec, hypr-yamctl next
+bindd = $ymMod, {{KEY_PREV}}, Previous track, exec, hypr-yamctl prev
+
+# Internal volume control (Mod + Shift + Wheel / Middle click)
+bindd = $ymMod SHIFT, mouse_up,   YM volume +2%, exec, hypr-yamctl volume up 2
+bindd = $ymMod SHIFT, mouse_down, YM volume -2%, exec, hypr-yamctl volume down 2
+bindd = $ymMod SHIFT, mouse:274,  YM mute,      exec, hypr-yamctl volume mute

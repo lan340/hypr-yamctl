@@ -1,4 +1,5 @@
-# Yandex Music for Waybar & Hyprland 🎵❤️
+# hypr-yamctl 🎵❤️
+### Управление и интеграция Яндекс Музыки для Hyprland & Waybar
 
 Комплексная и отказоустойчивая интеграция **Яндекс Музыки** в панель **Waybar** и оконный менеджер **Hyprland** для Linux (CachyOS, Arch Linux, Fedora, Ubuntu и любых других дистрибутивов).
 
@@ -37,8 +38,8 @@
 
 1. Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/your-username/yamusic-waybar.git
-   cd yamusic-waybar
+   git clone https://github.com/your-username/hypr-yamctl.git
+   cd hypr-yamctl
    ```
 
 2. Запустите интерактивный скрипт установки:

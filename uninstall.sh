@@ -73,8 +73,6 @@ HYPRLAND_MAIN="$HOME/.config/hypr/hyprland.conf"
 if [[ -f "$HYPRLAND_MAIN" ]]; then
     sed -i '/source = .*hypr-yamctl\.conf/d' "$HYPRLAND_MAIN"
     sed -i '/source = .*yamusic\.conf/d' "$HYPRLAND_MAIN"
-    sed -i '/hypr-yamctl\.conf/d' "$HYPRLAND_MAIN" 2>/dev/null || true
-    sed -i '/yamusic\.conf/d' "$HYPRLAND_MAIN" 2>/dev/null || true
     success "Привязка hypr-yamctl.conf удалена из $HYPRLAND_MAIN."
 fi
 

@@ -35,7 +35,7 @@ YM_WPVOL="$(find_bin ym_wpvol)"
 
 signal_waybar() {
     local sig="$1"
-    pkill -x "-RTMIN+${sig}" waybar 2>/dev/null || true
+    pkill --signal "RTMIN+${sig}" -x waybar 2>/dev/null || true
 }
 
 cmd_play_pause() {
@@ -61,10 +61,11 @@ cmd_like() {
 cmd_volume() {
     local subaction="${1:-}"
     shift || true
+    local step=""
 
     case "$subaction" in
         up|\+*)
-            local step="${1:-}"
+            step="${1:-}"
             [[ -z "$step" && "$subaction" =~ ^\+([0-9]+) ]] && step="${BASH_REMATCH[1]}"
             step="${step:-2}"
             if ! curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/up?step=${step}" >/dev/null 2>&1; then
@@ -72,7 +73,7 @@ cmd_volume() {
             fi
             ;;
         down|\-*)
-            local step="${1:-}"
+            step="${1:-}"
             [[ -z "$step" && "$subaction" =~ ^\-([0-9]+) ]] && step="${BASH_REMATCH[1]}"
             step="${step:-2}"
             if ! curl -m 1 -fsS -X POST "http://127.0.0.1:17312/ymvol/down?step=${step}" >/dev/null 2>&1; then
@@ -162,7 +163,7 @@ cmd_status() {
 cmd_launch() {
     local yandex_music_bin
     yandex_music_bin="$(find_bin yandex-music)"
-    if [[ -x "$yandex_music_bin" ]]; then
+    if command -v "$yandex_music_bin" &>/dev/null || [[ -x "$yandex_music_bin" ]]; then
         echo -e "${BLUE}[INFO]${RESET} Запуск Яндекс Музыки с отладкой..."
         nohup "$yandex_music_bin" >/dev/null 2>&1 &
         echo -e "${GREEN}[✓]${RESET} Приложение запущено в фоне."

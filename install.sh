@@ -92,13 +92,6 @@ if [[ ${#MISSING_DEPS[@]} -gt 0 ]]; then
         echo -n "Хотите установить их автоматически через $PKG_MANAGER? [Y/n]: "
         read -r ans
         if [[ "${ans:-y}" =~ ^[Yy]?$ ]]; then
-            if [[ "$PKG_MANAGER" =~ ^(pacman|dnf|apt)$ ]]; then
-                info "Для установки пакетов требуются права sudo. Пожалуйста, введите пароль:"
-                if ! sudo -v; then
-                    error "Не удалось получить права sudo. Установка отменена."
-                    exit 1
-                fi
-            fi
             info "Запуск установки: $INSTALL_CMD ${MISSING_DEPS[*]}..."
             if ! $INSTALL_CMD "${MISSING_DEPS[@]}"; then
                 error "Ошибка при установке пакетов через $PKG_MANAGER. Пожалуйста, установите ${MISSING_DEPS[*]} вручную."
@@ -124,7 +117,8 @@ elif command -v electron &>/dev/null; then
 elif command -v node &>/dev/null; then
     NODE_EXEC="node"
 else
-    NODE_EXEC="node"
+    error "Среда выполнения JavaScript (electron / nodejs) не найдена."
+    exit 1
 fi
 success "Среда выполнения JS: $NODE_EXEC"
 
@@ -217,7 +211,7 @@ if [[ "$INSTALL_WAYBAR" == "true" ]]; then
     ALREADY_INSTALLED="$(echo "$SCAN_JSON" | jq -r '.already_installed')"
 
     if [[ "$ALREADY_INSTALLED" == "true" ]]; then
-        warn "Модули Яндекс Музыки уже обнаружены в конфигурации Waybar!"
+        warn "Модули hypr-yamctl уже обнаружены в конфигурации Waybar!"
         echo -n "Переустановить / обновить интеграцию заново? [Y/n]: "
         read -r ans
         if [[ ! "${ans:-y}" =~ ^[Yy]?$ ]]; then
@@ -445,8 +439,10 @@ success "Резервные копии созданы с суффиксом .bak
 
 # 1. Установка исполняемых файлов в ~/.local/bin/
 info "Установка скриптов в ~/.local/bin/..."
-cp "$SCRIPT_DIR/bin/"* "$HOME/.local/bin/"
-chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym 2>/dev/null || true
+for f in "$SCRIPT_DIR/bin/"*; do
+    [[ -f "$f" ]] && cp "$f" "$HOME/.local/bin/"
+done
+chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym "$HOME/.local/bin/"waybar-single 2>/dev/null || true
 
 # Генерация ym-node
 NODE_BIN_PATH="$(command -v "$NODE_EXEC" || echo "$NODE_EXEC")"
@@ -555,4 +551,4 @@ echo ""
 echo -e "${GREEN}${BOLD}======================================================${RESET}"
 echo -e "${GREEN}${BOLD}       Установка успешно завершена!                   ${RESET}"
 echo -e "${GREEN}${BOLD}======================================================${RESET}"
-echo "Для удаления или отката в любой момент выполните: ./uninstall.sh"
+echo "Для удаления или отката в любой момент выполните: $SCRIPT_DIR/uninstall.sh"

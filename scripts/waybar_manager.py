@@ -313,7 +313,7 @@ if __name__ == '__main__':
     elif action == "patch":
         cmd_patch(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
     elif action == "unpatch":
-        cmd_unpatch(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "yamusic-modules.json")
+        cmd_unpatch(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "hypr-yamctl-modules.json")
     else:
         print(f"Unknown action: {action}")
         sys.exit(1)

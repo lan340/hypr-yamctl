@@ -442,7 +442,7 @@ info "Установка скриптов в ~/.local/bin/..."
 for f in "$SCRIPT_DIR/bin/"*; do
     [[ -f "$f" ]] && cp "$f" "$HOME/.local/bin/"
 done
-chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"mpris-ym "$HOME/.local/bin/"waybar-single 2>/dev/null || true
+chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"waybar-single 2>/dev/null || true
 
 # Генерация ym-node
 NODE_BIN_PATH="$(command -v "$NODE_EXEC" || echo "$NODE_EXEC")"

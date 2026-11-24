@@ -1,5 +1,5 @@
 /* =========================================================================
-   Yandex Music Waybar Styling
+   hypr-yamctl Waybar Styling
    ========================================================================= */
 
 /* Heart (Like) button */
@@ -72,7 +72,7 @@
   padding-left: 55px;
 }
 
-/* Yandex Music Volume */
+/* hypr-yamctl Volume */
 #custom-ym_volume {
   background-color: #111827;
   border-radius: 14px;

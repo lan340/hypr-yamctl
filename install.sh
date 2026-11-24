@@ -442,6 +442,8 @@ info "Установка скриптов в ~/.local/bin/..."
 for f in "$SCRIPT_DIR/bin/"*; do
     [[ -f "$f" ]] && cp "$f" "$HOME/.local/bin/"
 done
+mkdir -p "$HOME/.local/share/hypr-yamctl"
+cp "$SCRIPT_DIR/scripts/waybar_manager.py" "$HOME/.local/share/hypr-yamctl/"
 chmod +x "$HOME/.local/bin/"hypr-yamctl "$HOME/.local/bin/"ym-* "$HOME/.local/bin/"ym_* "$HOME/.local/bin/"yandex-music* "$HOME/.local/bin/"waybar-single 2>/dev/null || true
 
 # Генерация ym-node
@@ -551,4 +553,4 @@ echo ""
 echo -e "${GREEN}${BOLD}======================================================${RESET}"
 echo -e "${GREEN}${BOLD}       Установка успешно завершена!                   ${RESET}"
 echo -e "${GREEN}${BOLD}======================================================${RESET}"
-echo "Для удаления или отката в любой момент выполните: $SCRIPT_DIR/uninstall.sh"
+echo "Для удаления или отката в любой момент выполните: hypr-yamctl uninstall (или $SCRIPT_DIR/uninstall.sh)"

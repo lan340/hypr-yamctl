@@ -47,9 +47,16 @@ WAYBAR_CONFIG=""
 [[ -f "$HOME/.config/waybar/config" ]] && WAYBAR_CONFIG="$HOME/.config/waybar/config"
 [[ -f "$HOME/.config/waybar/config.jsonc" ]] && WAYBAR_CONFIG="$HOME/.config/waybar/config.jsonc"
 
-if [[ -n "$WAYBAR_CONFIG" ]]; then
+WAYBAR_MGR=""
+if [[ -f "$SCRIPT_DIR/scripts/waybar_manager.py" ]]; then
+    WAYBAR_MGR="$SCRIPT_DIR/scripts/waybar_manager.py"
+elif [[ -f "$HOME/.local/share/hypr-yamctl/waybar_manager.py" ]]; then
+    WAYBAR_MGR="$HOME/.local/share/hypr-yamctl/waybar_manager.py"
+fi
+
+if [[ -n "$WAYBAR_CONFIG" && -n "$WAYBAR_MGR" ]]; then
     info "Удаление модулей из $WAYBAR_CONFIG..."
-    python3 "$SCRIPT_DIR/scripts/waybar_manager.py" unpatch "$WAYBAR_CONFIG" 2>/dev/null || true
+    python3 "$WAYBAR_MGR" unpatch "$WAYBAR_CONFIG" 2>/dev/null || true
     success "Модули удалены из конфигурации Waybar."
 fi
 
@@ -87,6 +94,7 @@ rm -f "$HOME/.local/bin/hypr-yamctl" \
       "$HOME/.local/bin/mpris-ym" \
       "$HOME/.local/bin/yandex-music" \
       "$HOME/.local/bin/waybar-single"
+rm -rf "$HOME/.local/share/hypr-yamctl"
 success "Бинарные файлы удалены."
 
 # 5. Check if user wants to restore latest backup

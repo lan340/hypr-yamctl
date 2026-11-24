@@ -173,6 +173,22 @@ cmd_launch() {
     fi
 }
 
+cmd_uninstall() {
+    local uninstaller=""
+    if [[ -x "$SCRIPT_DIR/uninstall.sh" ]]; then
+        uninstaller="$SCRIPT_DIR/uninstall.sh"
+    elif [[ -x "$SCRIPT_DIR/../uninstall.sh" ]]; then
+        uninstaller="$SCRIPT_DIR/../uninstall.sh"
+    fi
+
+    if [[ -n "$uninstaller" ]]; then
+        exec bash "$uninstaller" "$@"
+    else
+        echo -e "${YELLOW}[!]${RESET} Локальный файл uninstall.sh не найден. Загрузка установщика из репозитория..."
+        bash <(curl -fsSL https://raw.githubusercontent.com/lan340/hypr-yamctl/main/uninstall.sh) "$@"
+    fi
+}
+
 cmd_help() {
     echo -e "${BOLD}hypr-yamctl${RESET} — Единая утилита управления Яндекс Музыкой для Hyprland & Waybar
 
@@ -197,6 +213,7 @@ ${BOLD}Управление службами:${RESET}
   stop                              Полностью остановить фоновые службы
   restart                           Перезапустить фоновые службы
   launch, app                       Запустить Яндекс Музыку с портом отладки 9222
+  uninstall, remove                 Полностью удалить hypr-yamctl из системы
 
 ${BOLD}Справка:${RESET}
   help, --help, -h                  Показать эту справку"
@@ -239,6 +256,9 @@ case "$ACTION" in
         ;;
     launch|app)
         cmd_launch
+        ;;
+    uninstall|remove)
+        cmd_uninstall "$@"
         ;;
     help|--help|-h)
         cmd_help
